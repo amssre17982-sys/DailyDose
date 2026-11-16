@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cyber-neon">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifeOS — Your Personal Life Dashboard</title>
+  <meta name="description" content="One aesthetic dashboard to manage your everyday life, studies, habits, and goals. Designed for today's generation.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js for interactive analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Canvas Confetti for celebrations -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+  <!-- Ambient Background Glow Elements -->
+  <div class="ambient-glow glow-1" aria-hidden="true"></div>
+  <div class="ambient-glow glow-2" aria-hidden="true"></div>
+
+  <!-- Main Navigation Header -->
+  <header class="top-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-logo">
+          <span class="logo-icon">🪐</span>
+          <div class="brand-text">
+            <span class="brand-name">Life<span class="highlight">OS</span></span>
+            <span class="brand-badge">GEN·Z EDITION</span>
+          </div>
+        </div>
+
+        <div class="live-clock-pill" id="liveClockPill">
+          <span class="status-indicator"></span>
+          <span class="clock-time" id="liveTime">00:00:00</span>
+          <span class="clock-date" id="liveDate">Mon, Jan 1</span>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Strip -->
+      <div class="header-stats-strip">
+        <div class="quick-stat-badge" title="Active Daily Habit Streak">
+          <span class="stat-icon">🔥</span>
+          <span class="stat-value" id="headerStreakCount">5</span>
+          <span class="stat-label">Day Streak</span>
+        </div>
+        <div class="quick-stat-badge" title="Tasks Completed Today">
+          <span class="stat-icon">⚡</span>
+          <span class="stat-value" id="headerTasksRatio">4/7</span>
+          <span class="stat-label">Tasks</span>
+        </div>
+        <div class="quick-stat-badge" title="Minutes Studied Today">
+          <span class="stat-icon">⏱️</span>
+          <span class="stat-value" id="headerStudyMinutes">75m</span>
+          <span class="stat-label">Focus</span>
+        </div>
+      </div>
+
+      <!-- Actions & Controls -->
+      <div class="header-controls">
+        <!-- Ambient Sound Mini-Controller -->
+        <div class="ambient-sound-toggle-group">
+          <button class="icon-btn" id="ambientSoundBtn" title="Toggle Ambient Study Sounds" aria-label="Toggle Ambient Audio">
+            <span class="icon" id="soundIcon">🎧</span>
+            <span class="btn-text">Audio</span>
+          </button>
+          <div class="ambient-dropdown" id="ambientDropdown">
+            <div class="dropdown-header">
+              <span>Ambient Soundscapes</span>
+              <span class="live-tag" id="ambientStatus">Paused</span>
+            </div>
+            <div class="sound-presets">
+              <button class="sound-preset-btn active" data-sound="rain">🌧️ Lofi Rain</button>
+              <button class="sound-preset-btn" data-sound="cafe">☕ Cozy Cafe</button>
+              <button class="sound-preset-btn" data-sound="forest">🌲 Wind & Forest</button>
+              <button class="sound-preset-btn" data-sound="binaural">🧠 40Hz Focus</button>
+              <button class="sound-preset-btn" data-sound="waves">🌊 Deep Waves</button>
+            </div>
+            <div class="volume-slider-row">
+              <span>Volume</span>
+              <input type="range" id="ambientVolume" min="0" max="100" value="40" aria-label="Ambient volume">
+            </div>
+          </div>
+        </div>
+
+        <!-- Zen Study Mode Button -->
+        <button class="action-btn zen-btn" id="enterZenBtn" title="Enter Distraction-Free Zen Study Mode">
+          <span class="icon">✨</span>
+          <span>Zen Mode</span>
+        </button>
+
+        <!-- Theme Selector Menu -->
+        <div class="theme-dropdown-container">
+          <button class="icon-btn theme-toggle-btn" id="themeSelectBtn" title="Switch Aesthetic Theme" aria-label="Select Theme">
+            <span class="icon" id="currentThemeIcon">🔮</span>
+            <span class="btn-text" id="currentThemeName">Cyber Neon</span>
+            <span class="arrow">▾</span>
+          </button>
+          <div class="theme-menu" id="themeMenu">
+            <div class="theme-menu-header">Select Vibe</div>
+            <button class="theme-opt-btn active" data-theme="cyber-neon">
+              <span class="theme-dot" style="background: linear-gradient(135deg, #a855f7, #06b6d4)"></span>
+              <span>🔮 Cyber Neon</span>
+            </button>
+            <button class="theme-opt-btn" data-theme="cozy-lofi">
+              <span class="theme-dot" style="background: linear-gradient(135deg, #d97706, #10b981)"></span>
+              <span>☕ Cozy Lofi Study</span>
+            </button>
+            <button class="theme-opt-btn" data-theme="tokyo-pastel">
+              <span class="theme-dot" style="background: linear-gradient(135deg, #ec4899, #8b5cf6)"></span>
+              <span>🌸 Tokyo Pastel</span>
+            </button>
+            <button class="theme-opt-btn" data-theme="neo-brutalist">
+              <span class="theme-dot" style="background: linear-gradient(135deg, #facc15, #f97316)"></span>
+              <span>⚡ Neo-Brutalist</span>
+            </button>
+            <button class="theme-opt-btn" data-theme="minimal-obsidian">
+              <span class="theme-dot" style="background: linear-gradient(135deg, #e2e8f0, #475569)"></span>
+              <span>🖤 Minimal Obsidian</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Customize Widgets Button -->
+        <button class="icon-btn" id="customizeWidgetsBtn" title="Customize Dashboard Widgets" aria-label="Customize Widgets">
+          <span class="icon">⚙️</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main LifeOS Workspace -->
+  <main class="dashboard-wrapper">
+    <!-- Welcome Greeting & Daily Vibe Banner -->
+    <section class="welcome-banner" id="widget-welcome">
+      <div class="welcome-left">
+        <div class="greeting-row">
+          <h1 class="greeting-heading" id="greetingText">Good morning, <span class="editable-name" id="userNameDisplay" title="Click to edit name" tabindex="0">Alex</span> ✨</h1>
+          <span class="vibe-tag" id="dailyVibeTag">Ready to conquer today</span>
+        </div>
+        <p class="motivational-quote" id="dailyQuoteText">
+          "Small daily disciplines repeated consistently lead to monumental achievements."
+        </p>
+      </div>
+
+      <div class="welcome-right">
+        <!-- Daily Life Score Gauge -->
+        <div class="life-score-card">
+          <div class="score-ring-wrap">
+            <svg class="score-svg" viewBox="0 0 100 100">
+              <circle class="score-circle-bg" cx="50" cy="50" r="40" />
+              <circle class="score-circle-progress" id="scoreCircleProgress" cx="50" cy="50" r="40" />
+            </svg>
+            <div class="score-inner-text">
+              <span class="score-percent" id="dailyScoreVal">86%</span>
+              <span class="score-sub">OPTIMAL</span>
+            </div>
+          </div>
+          <div class="score-details">
+            <span class="score-title">Daily Life Score</span>
+            <span class="score-caption" id="scoreDescription">Crushing your routines today!</span>
+          </div>
+        </div>
+
+        <!-- Quick Action Bar -->
+        <div class="quick-action-bar">
+          <button class="quick-btn" id="quickAddTaskBtn" title="Add a new task">
+            <span>+</span> Task
+          </button>
+          <button class="quick-btn" id="quickAddHabitBtn" title="Create a new habit">
+            <span>+</span> Habit
+          </button>
+          <button class="quick-btn" id="quickStartTimerBtn" title="Start Focus Session">
+            <span>⚡</span> Focus
+          </button>
+          <button class="quick-btn" id="quickLogMoodBtn" title="Log current mood">
+            <span>💭</span> Check-in
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bento Grid of LifeOS Core Widgets -->
+    <div class="bento-grid" id="bentoContainer">
+
+      <!-- ============================================== -->
+      <!-- WIDGET 1: STUDY & PRODUCTIVITY TIMER           -->
+      <!-- ============================================== -->
+      <section class="bento-card widget-timer" id="widget-timer" data-widget-id="timer">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-icon">⏳</span>
+            <div>
+              <h2 class="card-title">Study & Focus Timer</h2>
+              <p class="card-subtitle">Deep work sessions & Pomodoro</p>
+            </div>
+          </div>
+          <div class="timer-mode-selector" role="tablist">
+            <button class="timer-mode-btn active" data-mode="pomodoro">Pomodoro</button>
+            <button class="timer-mode-btn" data-mode="shortBreak">Short Break</button>
+            <button class="timer-mode-btn" data-mode="longBreak">Long Break</button>
+            <button class="timer-mode-btn" data-mode="stopwatch">Stopwatch</button>
+          </div>
+        </div>
+
+        <div class="timer-body">
+          <!-- Circular Timer Ring -->
+          <div class="timer-dial-container">
+            <svg class="timer-svg" viewBox="0 0 240 240">
+              <circle class="timer-bg-ring" cx="120" cy="120" r="105" />
+              <circle class="timer-progress-ring" id="timerProgressRing" cx="120" cy="120" r="105" />
+            </svg>
+            <div class="timer-dial-content">
+              <span class="timer-status-pill" id="timerStatusPill">Ready to Focus</span>
+              <div class="timer-digits" id="timerDisplay">25:00</div>
+              <div class="timer-subject-pill" id="currentSubjectBadge">📚 General Study</div>
+            </div>
+          </div>
+
+          <!-- Timer Controls -->
+          <div class="timer-controls">
+            <button class="btn-timer-secondary" id="timerResetBtn" title="Reset Session" aria-label="Reset Timer">
+              <span class="icon">↺</span>
+            </button>
+            <button class="btn-timer-primary" id="timerToggleBtn" title="Start / Pause Session" aria-label="Start or Pause Timer">
+              <span class="btn-play-icon" id="timerPlayIcon">▶</span>
+              <span id="timerPlayText">Start Focus</span>
+            </button>
+            <button class="btn-timer-secondary" id="timerSkipBtn" title="Skip Session" aria-label="Skip to Next Mode">
+              <span class="icon">⏭</span>
+            </button>
+          </div>
+
+          <!-- Subject Tag Selector & Session Stats -->
+          <div class="timer-meta-strip">
+            <div class="subject-picker-wrap">
+              <label for="studySubjectSelect">Tag Subject:</label>
+              <select id="studySubjectSelect" class="styled-select">
+                <option value="💻 Coding & Dev">💻 Coding & Dev</option>
+                <option value="📚 Exam Prep">📚 Exam Prep</option>
+                <option value="🎨 Creative & Design">🎨 Creative & Design</option>
+                <option value="📖 Reading">📖 Reading</option>
+                <option value="⚡ Deep Work" selected>⚡ Deep Work</option>
+                <option value="📝 Writing">📝 Writing</option>
+              </select>
+            </div>
+            <div class="focus-stats-mini">
+              <span>Today: <strong id="timerSessionCount">3</strong> sessions</span>
+              <span>•</span>
+              <span><strong id="timerTotalMinutes">75</strong> mins logged</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- WIDGET 2: DAILY PLANNER & TO-DO LIST           -->
+      <!-- ============================================== -->
+      <section class="bento-card widget-planner" id="widget-planner" data-widget-id="planner">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-icon">📋</span>
+            <div>
+              <h2 class="card-title">Daily Planner & To-Do</h2>
+              <p class="card-subtitle">Prioritize, schedule, execute</p>
+            </div>
+          </div>
+          <div class="planner-view-toggle">
+            <button class="view-btn active" id="viewListBtn" title="List View">List</button>
+            <button class="view-btn" id="viewScheduleBtn" title="Time Block Schedule">Schedule</button>
+          </div>
+        </div>
+
+        <div class="planner-body">
+          <!-- Progress bar -->
+          <div class="planner-progress-wrap">
+            <div class="progress-info-row">
+              <span class="progress-label">Today's Progress</span>
+              <span class="progress-count" id="taskProgressRatio">4 / 7 completed (57%)</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="taskProgressBar" style="width: 57%;"></div>
+            </div>
+          </div>
+
+          <!-- Quick Add Input -->
+          <form class="task-quick-add" id="taskQuickAddForm">
+            <div class="quick-input-row">
+              <input type="text" id="taskTitleInput" placeholder="What do you need to crush today?..." required autocomplete="off">
+              <select id="taskCategoryInput" class="styled-select-sm" title="Category">
+                <option value="study">📚 Study</option>
+                <option value="code">💻 Dev</option>
+                <option value="personal">🧘 Life</option>
+                <option value="health">🏃 Health</option>
+                <option value="urgent">🔥 Urgent</option>
+              </select>
+              <select id="taskPriorityInput" class="styled-select-sm" title="Priority">
+                <option value="high">🔥 High</option>
+                <option value="medium" selected>⚡ Medium</option>
+                <option value="low">🌿 Low</option>
+              </select>
+              <button type="submit" class="btn-add-task" title="Add Task">+</button>
+            </div>
+          </form>
+
+          <!-- Filter Tabs -->
+          <div class="task-filter-bar">
+            <div class="filter-pills" role="tablist">
+              <button class="filter-pill active" data-filter="all">All (<span id="countAll">7</span>)</button>
+              <button class="filter-pill" data-filter="pending">Active (<span id="countPending">3</span>)</button>
+              <button class="filter-pill" data-filter="high">🔥 High</button>
+              <button class="filter-pill" data-filter="study">📚 Study</button>
+              <button class="filter-pill" data-filter="completed">Done (<span id="countDone">4</span>)</button>
+            </div>
+            <button class="btn-text-sm" id="clearCompletedTasksBtn" title="Clear all completed tasks">Clear Done</button>
+          </div>
+
+          <!-- Tasks List Container -->
+          <div class="tasks-scroll-container" id="taskListContainer">
+            <!-- Dynamic task items injected via JS -->
+          </div>
+
+          <!-- Time Block Schedule View (Toggled via button) -->
+          <div class="schedule-timeline-view hidden" id="scheduleTimelineView">
+            <div class="timeline-header">
+              <span>Time Blocking Schedule</span>
+              <span class="timeline-hint">Organized by time of day</span>
+            </div>
+            <div class="timeline-blocks" id="timelineBlocksContainer">
+              <!-- Dynamically populated time blocks -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- WIDGET 3: HABIT TRACKER WITH STREAKS           -->
+      <!-- ============================================== -->
+      <section class="bento-card widget-habits" id="widget-habits" data-widget-id="habits">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-icon">⚡</span>
+            <div>
+              <h2 class="card-title">Habit Tracker & Streaks</h2>
+              <p class="card-subtitle">Consistency creates destiny</p>
+            </div>
+          </div>
+          <button class="icon-btn-outline" id="addNewHabitBtn" title="Create Custom Habit">+ New Habit</button>
+        </div>
+
+        <div class="habits-body">
+          <!-- Habit Days Header Strip -->
+          <div class="habit-days-header" id="habitDaysHeader">
+            <!-- Dynamically populated with Mon-Sun dates -->
+          </div>
+
+          <!-- Habits List -->
+          <div class="habits-list-container" id="habitsListContainer">
+            <!-- Habit cards rendered here -->
+          </div>
+
+          <!-- Habit Streaks Milestone Banner -->
+          <div class="streak-achievement-banner" id="streakBanner">
+            <div class="streak-badge-icon">🏆</div>
+            <div class="streak-badge-info">
+              <span class="streak-badge-title">Weekly Habit Champion!</span>
+              <span class="streak-badge-desc">You're maintaining a 5+ day streak on all core habits. Keep blazing!</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- WIDGET 4: MOOD JOURNAL & DAILY REFLECTION      -->
+      <!-- ============================================== -->
+      <section class="bento-card widget-mood" id="widget-mood" data-widget-id="mood">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-icon">💭</span>
+            <div>
+              <h2 class="card-title">Mood Journal & Reflection</h2>
+              <p class="card-subtitle">Mental check-in & micro-journaling</p>
+            </div>
+          </div>
+          <span class="timestamp-tag" id="moodLastLoggedTag">Logged today</span>
+        </div>
+
+        <div class="mood-body">
+          <div class="mood-selector-wrap">
+            <label class="section-micro-label">How are you feeling right now?</label>
+            <div class="mood-options-grid">
+              <button class="mood-btn" data-mood="rad" data-score="5" title="Radiant / On fire!">
+                <span class="mood-emoji">🚀</span>
+                <span class="mood-name">Radiant</span>
+              </button>
+              <button class="mood-btn active" data-mood="good" data-score="4" title="Good / Peaceful">
+                <span class="mood-emoji">😊</span>
+                <span class="mood-name">Good</span>
+              </button>
+              <button class="mood-btn" data-mood="neutral" data-score="3" title="Neutral / Okay">
+                <span class="mood-emoji">😐</span>
+                <span class="mood-name">Neutral</span>
+              </button>
+              <button class="mood-btn" data-mood="low" data-score="2" title="Low / Exhausted">
+                <span class="mood-emoji">🌧️</span>
+                <span class="mood-name">Low</span>
+              </button>
+              <button class="mood-btn" data-mood="stressed" data-score="1" title="Stressed / Overwhelmed">
+                <span class="mood-emoji">⚡</span>
+                <span class="mood-name">Stressed</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Vibe Tags -->
+          <div class="mood-tags-wrap">
+            <label class="section-micro-label">Tags (select any that fit):</label>
+            <div class="mood-tags-container" id="moodTagsContainer">
+              <button class="mood-tag-chip selected" data-tag="Productive">#Productive</button>
+              <button class="mood-tag-chip selected" data-tag="Focused">#Focused</button>
+              <button class="mood-tag-chip" data-tag="Grateful">#Grateful</button>
+              <button class="mood-tag-chip" data-tag="Creative">#Creative</button>
+              <button class="mood-tag-chip" data-tag="Tired">#Tired</button>
+              <button class="mood-tag-chip" data-tag="Anxious">#Anxious</button>
+              <button class="mood-tag-chip" data-tag="Chill">#Chill</button>
+            </div>
+          </div>
+
+          <!-- Reflection Textarea -->
+          <div class="journal-input-wrap">
+            <label class="section-micro-label" for="journalNotesInput">One win or thought from today:</label>
+            <div class="journal-textarea-row">
+              <textarea id="journalNotesInput" rows="2" placeholder="Crushed my study goals early, feeling locked in..."></textarea>
+              <button class="btn-save-journal" id="saveMoodBtn" title="Save Check-in">Save</button>
+            </div>
+          </div>
+
+          <!-- Recent Mood Entries Micro-List -->
+          <div class="recent-journal-strip" id="recentMoodEntries">
+            <!-- Dynamically populated entries -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- WIDGET 5: PROGRESS CHARTS & ANALYTICS          -->
+      <!-- ============================================== -->
+      <section class="bento-card widget-analytics" id="widget-analytics" data-widget-id="analytics">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-icon">📈</span>
+            <div>
+              <h2 class="card-title">Progress & Insights</h2>
+              <p class="card-subtitle">Weekly trends & productivity curves</p>
+            </div>
+          </div>
+          <div class="chart-tab-group" role="tablist">
+            <button class="chart-tab-btn active" data-chart="focus">Focus Hours</button>
+            <button class="chart-tab-btn" data-chart="mood">Mood Trend</button>
+            <button class="chart-tab-btn" data-chart="habits">Habit Mastery</button>
+          </div>
+        </div>
+
+        <div class="analytics-body">
+          <div class="chart-container-box">
+            <canvas id="lifeOsMainChart"></canvas>
+            <div class="chart-fallback" id="chartFallback" style="display: none;">
+              <div class="simple-bar-chart" id="simpleFallbackChart"></div>
+            </div>
+          </div>
+
+          <!-- Insights Micro-Metrics -->
+          <div class="analytics-metrics-strip">
+            <div class="insight-metric">
+              <span class="insight-label">Weekly Focus</span>
+              <span class="insight-val" id="metricWeeklyFocus">14.5 hrs</span>
+              <span class="insight-delta positive">↑ 18% vs last wk</span>
+            </div>
+            <div class="insight-metric">
+              <span class="insight-label">Habit Consistency</span>
+              <span class="insight-val" id="metricHabitConsistency">89%</span>
+              <span class="insight-delta positive">↑ 5% vs last wk</span>
+            </div>
+            <div class="insight-metric">
+              <span class="insight-label">Average Vibe</span>
+              <span class="insight-val" id="metricAvgMood">4.2 / 5</span>
+              <span class="insight-delta neutral">Steady & strong</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- WIDGET 6: GOALS & VISION BOARD                 -->
+      <!-- ============================================== -->
+      <section class="bento-card widget-goals" id="widget-goals" data-widget-id="goals">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-icon">🎯</span>
+            <div>
+              <h2 class="card-title">Goals & Vision Board</h2>
+              <p class="card-subtitle">Quarterly targets & milestones</p>
+            </div>
+          </div>
+          <button class="icon-btn-outline" id="addNewGoalBtn" title="Add New Milestone">+ New Goal</button>
+        </div>
+
+        <div class="goals-body" id="goalsContainer">
+          <!-- Goal cards rendered dynamically -->
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- WIDGET 7: QUICK SCRATCHPAD / BRAIN DUMP        -->
+      <!-- ============================================== -->
+      <section class="bento-card widget-notes" id="widget-notes" data-widget-id="notes">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-icon">📝</span>
+            <div>
+              <h2 class="card-title">Brain Dump & Quick Notes</h2>
+              <p class="card-subtitle">Instant capture • auto-saves</p>
+            </div>
+          </div>
+          <span class="autosave-indicator" id="notesSaveStatus">Saved</span>
+        </div>
+
+        <div class="notes-body">
+          <textarea id="scratchpadInput" placeholder="Capture ideas, sudden thoughts, book recommendations, or study formulas..."></textarea>
+          <div class="notes-footer">
+            <span class="notes-count" id="notesCharCount">0 characters</span>
+            <button class="btn-text-sm" id="clearNotesBtn" title="Clear Scratchpad">Clear</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ============================================== -->
+  <!-- FULLSCREEN ZEN STUDY MODE OVERLAY              -->
+  <!-- ============================================== -->
+  <div class="zen-overlay hidden" id="zenOverlay" aria-modal="true" role="dialog">
+    <div class="zen-ambient-particles"></div>
+    <div class="zen-header">
+      <div class="zen-brand">
+        <span>🪐 LifeOS</span>
+        <span class="zen-tag">ZEN FOCUS MODE</span>
+      </div>
+      <button class="zen-exit-btn" id="exitZenBtn" title="Exit Zen Mode">✕ Exit Zen</button>
+    </div>
+
+    <div class="zen-centerpiece">
+      <div class="zen-subject-badge" id="zenSubjectBadge">📚 Deep Work & Study</div>
+      <div class="zen-timer-digits" id="zenTimerDisplay">25:00</div>
+      <div class="zen-session-info" id="zenSessionInfo">Pomodoro Session #4</div>
+
+      <div class="zen-controls">
+        <button class="zen-btn-ctrl" id="zenResetBtn" title="Reset">↺</button>
+        <button class="zen-btn-play" id="zenPlayBtn">
+          <span id="zenPlayIcon">▶</span>
+          <span id="zenPlayText">Resume Focus</span>
+        </button>
+        <button class="zen-btn-ctrl" id="zenSkipBtn" title="Skip">⏭</button>
+      </div>
+
+      <div class="zen-sound-bar">
+        <span class="zen-sound-label">Ambient Soundscape:</span>
+        <button class="zen-sound-chip active" data-sound="rain">🌧️ Rain</button>
+        <button class="zen-sound-chip" data-sound="cafe">☕ Cafe</button>
+        <button class="zen-sound-chip" data-sound="forest">🌲 Forest</button>
+        <button class="zen-sound-chip" data-sound="binaural">🧠 40Hz</button>
+      </div>
+    </div>
+
+    <div class="zen-footer-quote" id="zenQuote">
+      "Deep focus is the superpower of the modern age."
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: CUSTOMIZE DASHBOARD WIDGETS             -->
+  <!-- ============================================== -->
+  <div class="modal-backdrop hidden" id="customizeModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">⚙️</span>
+          <div>
+            <h3 class="modal-title">Customize Dashboard Widgets</h3>
+            <p class="modal-desc">Toggle and organize what appears on your LifeOS</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeCustomizeModalBtn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="widget-toggle-list" id="widgetToggleList">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="modal-divider"></div>
+
+        <div class="preferences-block">
+          <h4 class="pref-title">Data & Audio Controls</h4>
+          <div class="pref-row">
+            <span>Sound Effects (Clicks, Chimes, Alerts)</span>
+            <label class="switch-toggle">
+              <input type="checkbox" id="soundEffectsToggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="pref-row">
+            <span>Confetti Celebrations</span>
+            <label class="switch-toggle">
+              <input type="checkbox" id="confettiToggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-divider"></div>
+
+        <div class="data-management-row">
+          <button class="btn-secondary" id="exportDataBtn">📥 Export Backup (JSON)</button>
+          <label class="btn-secondary" id="importDataLabel">
+            📤 Import Backup
+            <input type="file" id="importDataInput" accept=".json" style="display:none">
+          </label>
+          <button class="btn-danger-outline" id="resetDemoDataBtn">↺ Reset Demo Data</button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary" id="saveCustomizeBtn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: CREATE CUSTOM HABIT                     -->
+  <!-- ============================================== -->
+  <div class="modal-backdrop hidden" id="habitModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">⚡</span>
+          <div>
+            <h3 class="modal-title">Create New Habit</h3>
+            <p class="modal-desc">Build identity through micro-actions</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeHabitModalBtn">✕</button>
+      </div>
+
+      <form id="newHabitForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="habitNameInput">Habit Name</label>
+            <input type="text" id="habitNameInput" placeholder="e.g. Read 20 pages, Gym workout, Meditate" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="habitEmojiInput">Emoji Icon</label>
+              <input type="text" id="habitEmojiInput" value="✨" maxlength="4" style="text-align:center; font-size:1.4rem;">
+            </div>
+            <div class="form-group">
+              <label for="habitCategoryInput">Category</label>
+              <select id="habitCategoryInput" class="styled-select">
+                <option value="Learning">Learning & Study</option>
+                <option value="Health">Health & Fitness</option>
+                <option value="Mindset">Mindset & Mindfulness</option>
+                <option value="Productivity">Productivity</option>
+                <option value="Creativity">Creativity</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="habitGoalInput">Target Frequency</label>
+            <select id="habitGoalInput" class="styled-select">
+              <option value="daily">Everyday (7 days / week)</option>
+              <option value="weekdays">Weekdays (Mon - Fri)</option>
+              <option value="weekend">Weekends only</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelHabitBtn">Cancel</button>
+          <button type="submit" class="btn-primary">Add Habit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: CREATE GOAL                             -->
+  <!-- ============================================== -->
+  <div class="modal-backdrop hidden" id="goalModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">🎯</span>
+          <div>
+            <h3 class="modal-title">Add Milestone Goal</h3>
+            <p class="modal-desc">Define target outcomes and track progress</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeGoalModalBtn">✕</button>
+      </div>
+
+      <form id="newGoalForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="goalTitleInput">Goal Title</label>
+            <input type="text" id="goalTitleInput" placeholder="e.g. Complete Web Dev Bootcamp, Score 95% in Finals" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="goalCategoryInput">Category</label>
+              <select id="goalCategoryInput" class="styled-select">
+                <option value="Academics">Academics & Study</option>
+                <option value="Career">Career & Dev</option>
+                <option value="Fitness">Fitness & Health</option>
+                <option value="Finance">Finance & Savings</option>
+                <option value="Personal">Personal Growth</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="goalTargetDateInput">Target Date</label>
+              <input type="date" id="goalTargetDateInput" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="goalCurrentProgress">Current Progress (%)</label>
+              <input type="number" id="goalCurrentProgress" min="0" max="100" value="25" required>
+            </div>
+            <div class="form-group">
+              <label for="goalEmoji">Emoji Badge</label>
+              <input type="text" id="goalEmoji" value="🚀" maxlength="4" style="text-align:center; font-size:1.4rem;">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelGoalBtn">Cancel</button>
+          <button type="submit" class="btn-primary">Save Goal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Core JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>
